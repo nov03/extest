@@ -52,6 +52,7 @@ export class ApiGatewayConstruct extends Construct {
 
     // API Gateway REST APIの設定
     const api = new apigateway.LambdaRestApi(this, 'Api', {
+      restApiName: `ex${props.recordName}API`,
       handler: stackIdLambda,
       proxy: false,
     });

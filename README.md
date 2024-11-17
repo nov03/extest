@@ -25,9 +25,24 @@ npm ci
 bin/env.tsを編集
 
 以下のサンプルを正しい形式で入力し保存。
+
+``` typescript
+
 export const config = {
     hostedZoneId: 'ZZZZZZZZZZ',
     zoneName: 'ZZZZ.hoge.co.jp',
     acmARN: 'arn:aws:acm:ap-northeast-1:ZZZZZZZZZZZZZZ:certificate/ZZZZZZZZZZZZZZZZZZ',
     acmUsARN: 'arn:aws:acm:us-east-1:ZZZZZZZZZZZZZZ:certificate/ZZZZZZZZZZZZZZ',
 };
+
+```
+
+## 手順4
+
+以下のコマンドで自身の検証環境にデプロイ。必要であればprofileを変更してください。
+
+``` bash
+
+npx cdk deploy --profile default
+
+```

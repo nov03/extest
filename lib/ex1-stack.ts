@@ -6,9 +6,6 @@ import * as certificatemanager from 'aws-cdk-lib/aws-certificatemanager';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as route53targets from 'aws-cdk-lib/aws-route53-targets';
 
-
-
-
 interface ExStackProps extends cdk.StackProps {
   hostedZoneId: string;
   zoneName: string;
@@ -16,7 +13,7 @@ interface ExStackProps extends cdk.StackProps {
   acmUsARN?: string;
 }
 
-interface RestApiConstructProps extends ExStackProps{
+interface RestApiConstructProps extends ExStackProps {
   message: string;
   recordName: string;
 }
@@ -54,14 +51,25 @@ export class ApiGatewayConstruct extends Construct {
     const api = new apigateway.LambdaRestApi(this, 'Api', {
       restApiName: `ex${props.recordName}API`,
       handler: stackIdLambda,
-      proxy: false,
+      proxy: false, // 明示的なリソース設定を行う
+      deployOptions: {
+        stageName: 'prod',
+        loggingLevel: apigateway.MethodLoggingLevel.INFO,
+        dataTraceEnabled: true,
+        metricsEnabled: true,
+      },
     });
+
+    // カスタムリソース /message の作成
+    const stackIdResource = api.root.addResource('message');
+    stackIdResource.addMethod('GET'); // GET メソッドを追加
 
     // カスタムドメインの設定
     const domainName = new apigateway.DomainName(this, 'DomainName', {
       domainName: `${recordName}.${zoneName}`,
       certificate,
     });
+
     domainName.addBasePathMapping(api);
 
     // Route 53 Aレコードを作成
@@ -70,10 +78,6 @@ export class ApiGatewayConstruct extends Construct {
       recordName,
       target: route53.RecordTarget.fromAlias(new route53targets.ApiGatewayDomain(domainName)),
     });
-
-    // /messageエンドポイントの定義
-    const stackIdResource = api.root.addResource('message');
-    stackIdResource.addMethod('GET');
   }
 }
 
@@ -86,19 +90,17 @@ export class ExStack extends cdk.Stack {
       hostedZoneId: props.hostedZoneId,
       zoneName: props.zoneName,
       acmARN: props.acmARN,
-      message: 'current', 
-      recordName: 'current', 
+      message: 'current',
+      recordName: 'current',
     });
-
 
     // 移行用API環境の作成
     new ApiGatewayConstruct(this, 'RestApiPilot', {
       hostedZoneId: props.hostedZoneId,
       zoneName: props.zoneName,
       acmARN: props.acmARN,
-      message: 'pilot', 
-      recordName: 'pilot', 
+      message: 'pilot',
+      recordName: 'pilot',
     });
-
   }
 }

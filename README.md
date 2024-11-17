@@ -1,14 +1,33 @@
-# Welcome to your CDK TypeScript project
+# 使い方
 
-This is a blank project for CDK development with TypeScript.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## 手順1
+git cloneした後以下のコマンドを実行
 
-## Useful commands
+```bash 
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+npm ci
+
+```
+
+
+## 手順2
+
+以下の要素を検証用AWSアカウントで作成
+
+* 使用可能なドメインをRoute53に作成
+* ap-northeast-1で*付きの証明書発行
+* us-east-1で*付きの証明書発行
+
+
+## 手順3
+
+bin/env.tsを編集
+
+以下のサンプルを正しい形式で入力し保存。
+export const config = {
+    hostedZoneId: 'ZZZZZZZZZZ',
+    zoneName: 'ZZZZ.hoge.co.jp',
+    acmARN: 'arn:aws:acm:ap-northeast-1:ZZZZZZZZZZZZZZ:certificate/ZZZZZZZZZZZZZZZZZZ',
+    acmUsARN: 'arn:aws:acm:us-east-1:ZZZZZZZZZZZZZZ:certificate/ZZZZZZZZZZZZZZ',
+};
